@@ -1,0 +1,11 @@
+{
+  "name": "language-juist",
+  "version": "1.0.0",
+  "description": "Adds syntax highlighting to Juist files in Atom",
+  "repository": "https://github.com/369David369/Juist-Language",
+  "license": "MIT",
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "dependencies": {}
+}

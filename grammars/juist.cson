@@ -1,0 +1,436 @@
+{
+  name: "Juist"
+  scopeName: "source.juist"
+  fileTypes: ["ju"]
+
+  patterns: [
+      {
+        include: "#comments"
+      }
+      {
+        include: "#imports"
+      }
+      {
+        include: "#statements"
+      }
+  ]
+
+  repository:
+      statements:
+        patterns: [
+          {
+            include: "#namespaces"
+          }
+          {
+            include: "#typedefs"
+          }
+          {
+            include: "#functions"
+          }
+          {
+            include: "#variables"
+          }
+          {
+            include: "#expressions"
+          }
+  ]
+  comments:
+      patterns: [
+        {
+          begin: "/\\*"
+          captures:
+            0:
+              name: "punctuation.definition.comment.juist"
+
+          end: "\\*/"
+          name: "comment.block.juist"
+          patterns: [include: "#comments"]
+        }
+        {
+          captures:
+            1:
+              name: "comment.line.double-slash.juist"
+
+            2:
+              name: "punctuation.definition.comment.juist"
+
+          match: "\\s*((//).*$\\n?)"
+        }
+      ]
+      namespaces:
+          patterns: [
+            {
+              match: "\\b(namespace)\\b"
+              name: "keyword.other.juist"
+            }
+            {
+              begin: "\\{"
+              end: "\\}"
+              patterns: [include: "#statements"]
+            }
+          ]
+
+        types:
+          patterns: [
+            {
+              match: "\\b(String|Int|Boolean|Char|Long|Double|Float)\\b"
+              name: "storage.type.buildin.juist"
+            }
+            {
+              begin: "\\b(Array|List|Map)<\\b"
+              beginCaptures:
+                1:
+                  name: "storage.type.buildin.collection.juist"
+
+              end: ">"
+              patterns: [
+                {
+                  include: "#types"
+                }
+                {
+                  include: "#keywords"
+                }
+              ]
+            }
+            {
+              begin: "\\w+<"
+              end: ">"
+              patterns: [
+                {
+                  include: "#types"
+                }
+                {
+                  include: "#keywords"
+                }
+              ]
+            }
+            {
+              begin: "(#)\\("
+              beginCaptures:
+                1:
+                  name: "keyword.operator.tuple.juist"
+
+              end: "\\)"
+              patterns: [include: "#expressions"]
+            }
+            {
+              begin: "\\{"
+              end: "\\}"
+              patterns: [include: "#statements"]
+            }
+            {
+              begin: "\\("
+              end: "\\)"
+              patterns: [include: "#types"]
+            }
+            {
+              match: "(->)"
+              name: "keyword.operator.declaration.juist"
+            }
+    ]
+    typedefs:
+      begin: "(?=\\s*(?:type))"
+      end: "(?=$)"
+      patterns: [
+        {
+          match: "\\b(type)\\b"
+          name: "keyword.other.juist"
+        }
+        {
+          begin: "<"
+          end: ">"
+          patterns: [include: "#generics"]
+        }
+        {
+          include: "#expressions"
+        }
+      ]
+      variables:
+     begin: "(?=\\s*(?:var|val))"
+     end: "(?=:|=|$)"
+     patterns: [
+       {
+         begin: "\\b(var|val)\\b"
+         beginCaptures:
+           1:
+             name: "keyword.other.juist"
+
+         end: "(?=:|=|$)"
+         patterns: [
+           {
+             begin: "<"
+             end: ">"
+             patterns: [include: "#generics"]
+           }
+           {
+             captures:
+               2:
+                 name: "entity.name.variable.juist"
+
+             match: "([\\.<\\?>\\w]+\\.)?(\\w+)"
+           }
+         ]
+       }
+       {
+         begin: "(:)"
+         beginCaptures:
+           1:
+             name: "keyword.operator.declaration.juist"
+
+         end: "(?==|$)"
+         patterns: [
+           {
+             include: "#types"
+           }
+         ]
+       }
+       {
+         begin: "(=)"
+         beginCaptures:
+           1:
+             name: "keyword.operator.assignment.juist"
+
+         end: "(?=$)"
+         patterns: [
+           {
+             include: "#expressions"
+           }
+         ]
+       }
+     ]
+     functions:
+      begin: "(?=\\s*(?:fun))"
+      end: "}|(?=$)"
+      patterns: [
+        {
+          begin: "\\b(fun)\\b"
+          beginCaptures:
+            1:
+              name: "keyword.other.juist"
+
+          end: "(?=\\()"
+          patterns: [
+            {
+              begin: "<"
+              end: ">"
+              patterns: [include: "#generics"]
+            }
+            {
+              captures:
+                2:
+                  name: "entity.name.function.juist"
+
+              match: "([\\.<\\?>\\w]+\\.)?(\\w+)"
+            }
+          ]
+        }
+        {
+          begin: "\\("
+          end: "\\)"
+          patterns: [include: "#parameters"]
+        }
+        {
+          begin: "(:)"
+          beginCaptures:
+            1:
+              name: "keyword.operator.declaration.juist"
+
+          end: "(?={|=|$)"
+          patterns: [include: "#types"]
+        }
+        {
+          begin: "\\{"
+          end: "(?=\\})"
+          patterns: [include: "#statements"]
+        }
+        {
+          begin: "(=)"
+          beginCaptures:
+            1:
+              name: "keyword.operator.assignment.juist"
+
+          end: "(?=$)"
+          patterns: [include: "#expressions"]
+        }
+]
+parameters:
+      patterns: [
+        {
+          begin: "(:)"
+          beginCaptures:
+            1:
+              name: "keyword.operator.declaration.juist"
+
+          end: "(?=,|\\)|=)"
+          patterns: [include: "#types"]
+        }
+        {
+          begin: "(=)"
+          beginCaptures:
+            1:
+              name: "keyword.operator.declaration.juist"
+
+          end: "(?=,|\\))"
+          patterns: [include: "#expressions"]
+        }
+        {
+          include: "#keywords"
+        }
+        {
+          match: "\\w+"
+          name: "variable.parameter.function.juist"
+        }
+      ]
+
+    expressions:
+      patterns: [
+        {
+          begin: "\\("
+          end: "\\)"
+          patterns: [include: "#expressions"]
+        }
+        {
+          include: "#types"
+        }
+        {
+          include: "#strings"
+        }
+        {
+          include: "#constants"
+        }
+        {
+          include: "#comments"
+        }
+        {
+          include: "#keywords"
+        }
+      ]
+
+    strings:
+      patterns: [
+        {
+          begin: "\"\"\""
+          beginCaptures:
+            0:
+              name: "punctuation.definition.string.begin.juist"
+
+          end: "\"\"\""
+          endCaptures:
+            0:
+              name: "punctuation.definition.string.end.juist"
+
+          name: "string.quoted.third.juist"
+          patterns: [
+            {
+              match: "(\\$\\w+|\\$\\{[^\\}]+\\})"
+              name: "variable.parameter.template.juist"
+            }
+            {
+              match: "\\\\."
+              name: "constant.character.escape.juist"
+            }
+          ]
+        }
+        {
+          begin: "\""
+          beginCaptures:
+            0:
+              name: "punctuation.definition.string.begin.juist"
+
+          end: "\""
+          endCaptures:
+            0:
+              name: "punctuation.definition.string.end.juist"
+
+          name: "string.quoted.double.juist"
+          patterns: [
+            {
+              match: "(\\$\\w+|\\$\\{[^\\}]+\\})"
+              name: "variable.parameter.template.juist"
+            }
+            {
+              match: "\\\\."
+              name: "constant.character.escape.juist"
+            }
+          ]
+        }
+        {
+          begin: "'"
+          beginCaptures:
+            0:
+              name: "punctuation.definition.string.begin.juist"
+
+          end: "'"
+          endCaptures:
+            0:
+              name: "punctuation.definition.string.end.juist"
+
+          name: "string.quoted.single.juist"
+          patterns: [
+            match: "\\\\."
+            name: "constant.character.escape.juist"
+          ]
+        }
+        {
+          begin: "`"
+          beginCaptures:
+            0:
+              name: "punctuation.definition.string.begin.juist"
+
+          end: "`"
+          endCaptures:
+            0:
+              name: "punctuation.definition.string.end.juist"
+
+          name: "string.quoted.single.juist"
+        }
+]
+keywords:
+      patterns: [
+        {
+          match: "\\b(val)\\b"
+          name: "storage.modifier.juist"
+        }
+        {
+          match: "\\b(if|else|while|for|return|break|continue)\\b"
+          name: "keyword.control.juist"
+        }
+        {
+          match: "(==|!=|===|!==|<=|>=|<|>)"
+          name: "keyword.operator.comparison.juist"
+        }
+        {
+          match: "(=)"
+          name: "keyword.operator.assignment.juist"
+        }
+        {
+          match: "(:)"
+          name: "keyword.operator.declaration.juist"
+        }
+        {
+          match: "(/)"
+          name: "keyword.operator.dot.juist"
+        }
+        {
+          match: "(\\-\\-|\\+\\+)"
+          name: "keyword.operator.increment-decrement.juist"
+        }
+        {
+          match: "(\\+=|\\-=|\\*=|\\/=)"
+          name: "keyword.operator.arithmetic.assign.juist"
+        }
+        {
+          match: "(\\-|\\+|\\*|\\/|%)"
+          name: "keyword.operator.arithmetic.juist"
+        }
+        {
+          match: "(!|&&|\\|\\|)"
+          name: "keyword.operator.logical.juist"
+        }
+        {
+          match: "(;)"
+          name: "punctuation.terminator.juist"
+        }
+]
+
+}
