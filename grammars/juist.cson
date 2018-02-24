@@ -1,40 +1,43 @@
 {
-  name: "Juist"
+  name: "juist"
   scopeName: "source.juist"
-  fileTypes: ["ju"]
-
+  fileTypes: [
+    "ju"
+  ]
   patterns: [
-      {
-        include: "#comments"
-      }
-      {
-        include: "#imports"
-      }
-      {
-        include: "#statements"
-      }
+    {
+      include: "#comments"
+    }
+    {
+      captures:
+        1:
+          name: "keyword.other.juist"
+    }
+    {
+      include: "#statements"
+    }
   ]
-
   repository:
-      statements:
-        patterns: [
-          {
-            include: "#namespaces"
-          }
-          {
-            include: "#typedefs"
-          }
-          {
-            include: "#functions"
-          }
-          {
-            include: "#variables"
-          }
-          {
-            include: "#expressions"
-          }
-  ]
-  comments:
+    statements:
+      patterns: [
+        {
+          include: "#namespaces"
+        }
+        {
+          include: "#typedefs"
+        }
+        {
+          include: "#functions"
+        }
+        {
+          include: "#variables"
+        }
+        {
+          include: "#expressions"
+        }
+      ]
+
+    comments:
       patterns: [
         {
           begin: "/\\*"
@@ -57,77 +60,98 @@
           match: "\\s*((//).*$\\n?)"
         }
       ]
-      namespaces:
+    namespaces:
+      patterns: [
+        {
+          match: "\\b(namespace)\\b"
+          name: "keyword.other.juist"
+        }
+        {
+          begin: "\\{"
+          end: "\\}"
+          patterns: [include: "#statements"]
+        }
+      ]
+
+    types:
+      patterns: [
+        {
+          match: "\\b(String|Int|Boolean|Char|Long|Double|Float)\\b"
+          name: "storage.type.buildin.juist"
+        }
+        {
+          begin: "\\b(Array|List|Map)<\\b"
+          beginCaptures:
+            1:
+              name: "storage.type.buildin.collection.juist"
+
+          end: ">"
           patterns: [
             {
-              match: "\\b(namespace)\\b"
-              name: "keyword.other.juist"
+              include: "#types"
             }
             {
-              begin: "\\{"
-              end: "\\}"
-              patterns: [include: "#statements"]
+              include: "#keywords"
             }
           ]
-
-        types:
+        }
+        {
+          begin: "\\w+<"
+          end: ">"
           patterns: [
             {
-              match: "\\b(String|Int|Boolean|Char|Long|Double|Float)\\b"
-              name: "storage.type.buildin.juist"
+              include: "#types"
             }
             {
-              begin: "\\b(Array|List|Map)<\\b"
-              beginCaptures:
-                1:
-                  name: "storage.type.buildin.collection.juist"
+              include: "#keywords"
+            }
+          ]
+        }
+        {
+          begin: "(#)\\("
+          beginCaptures:
+            1:
+              name: "keyword.operator.tuple.juist"
 
-              end: ">"
-              patterns: [
-                {
-                  include: "#types"
-                }
-                {
-                  include: "#keywords"
-                }
-              ]
-            }
-            {
-              begin: "\\w+<"
-              end: ">"
-              patterns: [
-                {
-                  include: "#types"
-                }
-                {
-                  include: "#keywords"
-                }
-              ]
-            }
-            {
-              begin: "(#)\\("
-              beginCaptures:
-                1:
-                  name: "keyword.operator.tuple.juist"
+          end: "\\)"
+          patterns: [include: "#expressions"]
+        }
+        {
+          begin: "\\{"
+          end: "\\}"
+          patterns: [include: "#statements"]
+        }
+        {
+          begin: "\\("
+          end: "\\)"
+          patterns: [include: "#types"]
+        }
+        {
+          match: "(->)"
+          name: "keyword.operator.declaration.juist"
+        }
+      ]
 
-              end: "\\)"
-              patterns: [include: "#expressions"]
-            }
-            {
-              begin: "\\{"
-              end: "\\}"
-              patterns: [include: "#statements"]
-            }
-            {
-              begin: "\\("
-              end: "\\)"
-              patterns: [include: "#types"]
-            }
-            {
-              match: "(->)"
+    generics:
+      patterns: [
+        {
+          begin: "(:)"
+          beginCaptures:
+            1:
               name: "keyword.operator.declaration.juist"
-            }
-    ]
+
+          end: "(?=,|>)"
+          patterns: [include: "#types"]
+        }
+        {
+          include: "#keywords"
+        }
+        {
+          match: "\\w+"
+          name: "storage.type.generic.juist"
+        }
+      ]
+
     typedefs:
       begin: "(?=\\s*(?:type))"
       end: "(?=$)"
@@ -145,60 +169,8 @@
           include: "#expressions"
         }
       ]
-      variables:
-     begin: "(?=\\s*(?:var|val))"
-     end: "(?=:|=|$)"
-     patterns: [
-       {
-         begin: "\\b(var|val)\\b"
-         beginCaptures:
-           1:
-             name: "keyword.other.juist"
 
-         end: "(?=:|=|$)"
-         patterns: [
-           {
-             begin: "<"
-             end: ">"
-             patterns: [include: "#generics"]
-           }
-           {
-             captures:
-               2:
-                 name: "entity.name.variable.juist"
-
-             match: "([\\.<\\?>\\w]+\\.)?(\\w+)"
-           }
-         ]
-       }
-       {
-         begin: "(:)"
-         beginCaptures:
-           1:
-             name: "keyword.operator.declaration.juist"
-
-         end: "(?==|$)"
-         patterns: [
-           {
-             include: "#types"
-           }
-         ]
-       }
-       {
-         begin: "(=)"
-         beginCaptures:
-           1:
-             name: "keyword.operator.assignment.juist"
-
-         end: "(?=$)"
-         patterns: [
-           {
-             include: "#expressions"
-           }
-         ]
-       }
-     ]
-     functions:
+    functions:
       begin: "(?=\\s*(?:fun))"
       end: "}|(?=$)"
       patterns: [
@@ -252,8 +224,9 @@
           end: "(?=$)"
           patterns: [include: "#expressions"]
         }
-]
-parameters:
+      ]
+
+    parameters:
       patterns: [
         {
           begin: "(:)"
@@ -384,11 +357,28 @@ parameters:
 
           name: "string.quoted.single.juist"
         }
-]
-keywords:
+      ]
+
+    constants:
       patterns: [
         {
-          match: "\\b(val)\\b"
+          match: "\\b(true|false|null)\\b"
+          name: "constant.language.juist"
+        }
+        {
+          match: "\\b((0(x|X)[0-9a-fA-F]*)|(([0-9]+\\.?[0-9]*)|(\\.[0-9]+))((e|E)(\\+|-)?[0-9]+)?)([LlFfUuDd]|UL|ul)?\\b"
+          name: "constant.numeric.juist"
+        }
+        {
+          match: "\\b([A-Z][A-Z0-9_]+)\\b"
+          name: "constant.other.juist"
+        }
+      ]
+
+    keywords:
+      patterns: [
+        {
+          match: "\\b(var)\\b"
           name: "storage.modifier.juist"
         }
         {
@@ -408,7 +398,7 @@ keywords:
           name: "keyword.operator.declaration.juist"
         }
         {
-          match: "(/)"
+          match: "(\\.)"
           name: "keyword.operator.dot.juist"
         }
         {
@@ -418,6 +408,10 @@ keywords:
         {
           match: "(\\+=|\\-=|\\*=|\\/=)"
           name: "keyword.operator.arithmetic.assign.juist"
+        }
+        {
+          match: "(\\.\\.)"
+          name: "keyword.operator.range.juist"
         }
         {
           match: "(\\-|\\+|\\*|\\/|%)"
@@ -431,6 +425,5 @@ keywords:
           match: "(;)"
           name: "punctuation.terminator.juist"
         }
-]
-
+      ]
 }
