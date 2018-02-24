@@ -1,11 +1,33 @@
 {
   "name": "language-juist",
   "version": "1.2.0",
+  "main" : "./lib/main.js",
   "description": "Adds syntax highlighting to Juist files in Atom",
   "repository": "https://github.com/369David369/Juist-Language",
   "license": "MIT",
   "engines": {
     "atom": ">0.50.0"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "activationCommands": {
+    "atom-workspace": [
+      "autocomplete-java:refresh-project",
+      "autocomplete-java:full-refresh"
+    ]
+  },
+  "activationHooks": [
+    "language-java:grammar-used"
+  ],
+  "providedServices": {
+    "autocomplete.provider": {
+      "versions": {
+        "2.0.0": "getProvider"
+      }
+    }
+  },
+  "dependencies": {
+    "triejs": "0.1.5",
+    "lodash": "3.10.1",
+    "walk": "2.3.9"
+  }
 }

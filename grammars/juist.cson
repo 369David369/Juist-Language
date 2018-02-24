@@ -57,7 +57,7 @@
             2:
               name: "punctuation.definition.comment.juist"
 
-          match: "\\s*((//).*$\\n?)"
+          match: "\\s*((#).*$\\n?)"
         }
       ]
     namespaces:
@@ -378,7 +378,7 @@
     keywords:
       patterns: [
         {
-          match: "\\b(var)\\b"
+          match: "\\b(val)\\b"
           name: "storage.modifier.juist"
         }
         {

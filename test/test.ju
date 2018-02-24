@@ -1,0 +1,11 @@
+/*
+hello
+*/
+
+#adasdasd
+
+val Examplethink : Int = "tEST-HALLO"
+fun getNiceText() : String {
+    return Examplethink;
+
+}
